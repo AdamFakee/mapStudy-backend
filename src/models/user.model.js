@@ -2,20 +2,13 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../configs/database.config');
 
 const userSchema = sequelize.define('user', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        allowNull: false,
-    },
     name: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
     email: {
         type: DataTypes.STRING(100),
-        allowNull: false,
-        unique: true, 
+        primaryKey: true,
     },
     password: {
         type: DataTypes.STRING(255),
@@ -38,5 +31,7 @@ const userSchema = sequelize.define('user', {
     tableName : 'users',
     timestamps: false,
 })
+
+userSchema.removeAttribute('id')
 
 module.exports.userModel = userSchema;

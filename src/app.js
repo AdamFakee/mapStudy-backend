@@ -17,7 +17,7 @@ app.use(express.urlencoded({
 Database.getInstance()
 
 // init routes
-// app.use('/', require('./routes'));
+app.use('/', require('./routers/client/index.router.js'));
 
 // handle errors
 app.use((req, res, next) => {

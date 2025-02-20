@@ -3,4 +3,6 @@
 const express = require('express');
 const router = express.Router();
 
-module.exports.clientRouter = router;
+router.use('/api/v1/user', require('./user.router'));
+
+module.exports = router;
