@@ -20,6 +20,14 @@ const courseSchema = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    isNew: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    isHot: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     video_link: {
       type: DataTypes.STRING(500),
       allowNull: false,

@@ -9,7 +9,7 @@ const getAllTeachers = async ( options ) => {
             status: 'active'
         },
         raw: true,
-        limit: limit
+        limit: Number(limit)
     })
 }
 
