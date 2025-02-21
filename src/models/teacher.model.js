@@ -13,6 +13,10 @@ const teacherSchema = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
+    infor: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,
