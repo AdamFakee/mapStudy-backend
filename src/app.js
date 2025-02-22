@@ -2,9 +2,13 @@
 
 require('dotenv').config();
 const express = require('express');
+const cors = require("cors");
 const { Database } = require('./configs/database.config.js'); 
 
 const app = express();
+
+app.use(cors());
+
 
 // middleware
 app.use(express.json());

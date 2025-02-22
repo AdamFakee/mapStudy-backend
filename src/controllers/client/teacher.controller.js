@@ -7,8 +7,7 @@ const { getInfoData } = require("../../utils/object.util");
 const _getAllTeachers = async ( req, res, next ) => {
     const teachers = await getAllTeachers(req.query);
     if( teachers.length === 0 ) return new NoContent().send(res);
-    
-    const fields = [ 'name', 'thumbnail' ];
+    const fields = ['id', 'name', 'thumbnail' ];
     const metadata = { teachers: getInfoData({ fields, object: teachers }) };
     return new OK({ metadata }).send(res);
 }
