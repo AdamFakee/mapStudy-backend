@@ -10,7 +10,7 @@ class ErrorResponse extends Error {
     }
 
     send (res) {
-        return res.send(this.status).json({
+        return res.status(this.status).json({
             message: this.message,
             status: this.status
         })

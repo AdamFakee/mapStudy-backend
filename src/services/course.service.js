@@ -132,6 +132,16 @@ const getAllCourseBySearch = async (opts) => {
     };
 };
 
+
+const getOneCourseByCourseKey = async (courseKey) => {
+    const query = `
+        select Courses.id as courseId, CourseKeys.key_code as keyCode  from CourseKeys
+        join Courses on Courses.id = CourseKeys.course_id
+        where CourseKeys.key_code = '${courseKey}' and CourseKeys.status = 'active' and Courses.status = 'active'
+    `
+    return await rawQueryFrameHelper(query);
+}
+
 module.exports = {
-    getAllCourses, getCoursesByOptions, getDetailCourse_contain_detailChapter, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch
+    getAllCourses, getCoursesByOptions, getDetailCourse_contain_detailChapter, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch, getOneCourseByCourseKey
 }
