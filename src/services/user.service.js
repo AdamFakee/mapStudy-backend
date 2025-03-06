@@ -11,7 +11,6 @@ const createNewUser = async (data) => {
 
 
 const getUserByEmail = async ( email ) => {
-    console.log(hashEmailToHex(email))
     return await userModel.findOne({
         where: {
             email,

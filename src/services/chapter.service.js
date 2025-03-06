@@ -4,7 +4,7 @@ const { redisService } = require("./redis.service");
 const getChapterById = async (chapterId) => {
     // get from redis
     const redisKey = `chapter:${chapterId}`;
-    const cachedData = await redisService.get(redisKey);
+    const cachedData = await redisService.getString(redisKey);
     if (cachedData) {
         return cachedData;
     }
