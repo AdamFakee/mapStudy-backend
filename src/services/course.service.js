@@ -2,10 +2,19 @@
 
 const { rawQueryFrameHelper } = require("../helpers/rawQueryFrame.helper");
 const { courseModel } = require("../models/course.model");
+const { redisService } = require("./redis.service");
 
 // luôn trả về khóa học mới nhất nếu k có truyền opts
 const getCoursesByOptions = async ( opts ) => {
     const { isNew = false, isHot = true, limit = 10 } = opts;
+
+    // get from redis
+    const redisKey = `courses:byOptions:isHot:${isHot ? 'hot' : 'no'}:isNew:${isNew ? 'new' : 'no'}`;
+    const cachedData = await redisService.getString(redisKey);
+    if (cachedData) {
+        return cachedData;
+    }
+
     const query = `
         select teachers.id as teacherId, teachers.name as teacherName, teachers.thumbnail as teacherThubnail, courses.thumbnail as courseThumbnail, courses.name as courseName, courses.id as courseId  
         from courses
@@ -13,7 +22,9 @@ const getCoursesByOptions = async ( opts ) => {
         where isHot = ${isHot} and isNew = ${isNew}
         limit ${limit}
     `
-    return await rawQueryFrameHelper(query);
+    const listCourses = await rawQueryFrameHelper(query);
+    await redisService.setString(redisKey, listCourses); // lưu luôn cả not found để đỡ check luôn 
+    return listCourses;
 }
 
 const getAllCourses = async ( ) => {
@@ -45,9 +56,18 @@ const getDetailCourse_contain_detailChapter = async ( courseId ) => {
         from courses
         where id = ${courseId} and status = 'active'
     `
-    const [ detail_chapter, detail_course ] = await Promise.all(
-        [ rawQueryFrameHelper(queryDetail_chapter), rawQueryFrameHelper(queryDetail_course) ]
-    )
+
+    // get from redis
+    let detail_chapter = await redisService.getString(`detail_chapter:${courseId}`);
+    
+    if(!detail_chapter) {
+        detail_chapter = await rawQueryFrameHelper(queryDetail_chapter);
+        // add to redis 
+        await redisService.setString(`detail_chapter:${courseId}`, detail_chapter);
+    }
+    const detail_course = await rawQueryFrameHelper(queryDetail_course);
+
+
     return { detail_chapter, detail_course };
 }
 
@@ -63,6 +83,13 @@ const getAllCoursesByTeacherId = async ( teacherId ) => {
 
 const getAllCourseByCategoryId = async ( categoryId, opts ) => {
     const { limit = 16 } = opts;
+
+    // get from redis
+    const redisKey = `courses:byCategoryId:${categoryId}`;
+    const cachedData = await redisService.getString(redisKey);
+    if (cachedData) {
+        return cachedData;
+    }
     const query = `
         select courses.id as courseId, courses.thumbnail as courseThumbnail, courses.name as courseName, teachers.name as teacherName
         from categories
@@ -71,7 +98,9 @@ const getAllCourseByCategoryId = async ( categoryId, opts ) => {
         where categories.id = ${Number(categoryId)}
         limit ${Number(limit)};
     `
-    return await rawQueryFrameHelper(query);
+    const listCourses = await rawQueryFrameHelper(query);
+    await redisService.setString(redisKey, listCourses);
+    return listCourses;
 }
 
 const getAllCourseBySearch = async (opts) => {

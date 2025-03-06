@@ -1,8 +1,7 @@
 'use strict'
 
-const { where } = require("sequelize");
 const { userModel } = require("../models/user.model");
-const { raw } = require("mysql2");
+const { hashEmailToHex } = require("../helpers/hash.helper");
 
 // create new user 
 const createNewUser = async (data) => {
@@ -12,6 +11,7 @@ const createNewUser = async (data) => {
 
 
 const getUserByEmail = async ( email ) => {
+    console.log(hashEmailToHex(email))
     return await userModel.findOne({
         where: {
             email,

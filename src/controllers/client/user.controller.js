@@ -3,8 +3,10 @@
 const { BadRequestError, ConflictRequestError, AuthFailureError } = require("../../core/error.response");
 const { CREATED, CONFLICT, OK } = require("../../core/success.response");
 const { comparePassword, hashPassword } = require("../../helpers/bcrypt.helper");
+const { hashEmailToInt } = require("../../helpers/hash.helper");
 const { generateKeyPairForToken, createTokenPair } = require('../../helpers/jwt.helper');
 const { createNewKeyToken, createOrUpdateKeyToken, removerKeyTokenByEmail } = require("../../services/keyToken.service");
+const { redisService } = require("../../services/redis.service");
 const { createNewUser, getUserByEmail } = require("../../services/user.service");
 const { getInfoData } = require("../../utils/object.util");
 
@@ -12,8 +14,10 @@ const { getInfoData } = require("../../utils/object.util");
 const signup = async ( req, res ) => {
     // skip validation
     const { email, password } = req.body;
-
-    const existUser = await getUserByEmail( email );
+    const key = 'signup:user';
+    const offset = hashEmailToInt(email);
+    // check from redis 
+    const existUser = await redisService.getBitMap(key, offset)
     if( existUser ) throw new ConflictRequestError('Error::: user existed');
 
     const hashPass = await hashPassword( password );
@@ -33,6 +37,9 @@ const signup = async ( req, res ) => {
 
     const newKeyToken = await createNewKeyToken(newUser.email, { accessToken, refreshToken, privateKey, publicKey });
     if( !newKeyToken ) throw new BadRequestError('Error::: create new key token fail');
+
+    // set redis 
+    await redisService.setBitMap(key, offset);
 
     const fields = [ 'thumbnail', 'name', 'id', 'email' ];
     const metadata = { 
