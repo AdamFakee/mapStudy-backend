@@ -21,9 +21,6 @@ const lessonSchema = sequelize.define("Lesson", {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
-    content: {
-        type: DataTypes.TEXT,
-    },
     video_link: {
         type: DataTypes.STRING(500),
     },
