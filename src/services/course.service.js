@@ -2,6 +2,7 @@
 
 const { rawQueryFrameHelper } = require("../helpers/rawQueryFrame.helper");
 const { courseModel } = require("../models/course.model");
+const { groupCoursesByClass } = require("../utils/object.util");
 const { redisService } = require("./redis.service");
 
 // luôn trả về khóa học mới nhất nếu k có truyền opts
@@ -161,6 +162,66 @@ const getAllCourseBySearch = async (opts) => {
     };
 };
 
+const getAllCourseBySearchMobile = async (opts) => {
+    let { search = '', filters = '', _class = '', page = 1, limit = 16 } = opts;
+    const offset = (page - 1) * limit;
+    let condition = '';
+    
+    if (search.length > 0) {
+        condition += `courses.name LIKE '%${search}%'`;
+    }
+    if (filters.length > 0) {
+        condition += condition.length > 0 ? 
+            ` AND courses.subject_id in (${filters})` : 
+            `courses.subject_id in (${filters})`;
+    }
+    if (_class.length > 0 && _class !== 'all') {
+        condition += condition.length > 0 ? 
+            ` AND courses.class_id = ${Number(_class)}` : 
+            `courses.class_id = ${Number(_class)}`;
+    }
+
+    //  tính total pagepage
+    const countQuery = `
+        SELECT COUNT(*) as total
+        FROM courses
+        JOIN teachers ON courses.teacher_id = teachers.id
+        ${condition ? 'WHERE ' + condition : ''}
+    `;
+
+    // lấy data
+    const dataQuery = `
+        SELECT
+            courses.id as courseId,
+            courses.thumbnail as courseThumbnail,
+            courses.name as courseName,
+            teachers.name as teacherName,
+            courses.class_id as courseClass
+        FROM courses
+        JOIN teachers ON courses.teacher_id = teachers.id
+        ${condition ? 'WHERE ' + condition : ''}
+        LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    // Thực hiện cả 2 query
+    const [totalResult, courses] = await Promise.all([
+        rawQueryFrameHelper(countQuery),
+        rawQueryFrameHelper(dataQuery)
+    ]);
+
+    const total = totalResult[0].total; // tổng số bản ghi 
+    const totalPages = Math.ceil(total / limit);
+
+    const sectionCourses = groupCoursesByClass(courses, "courseClass");
+
+    return {
+        courses: sectionCourses,
+        pagination: {
+            totalPages,
+            currentPage: page,
+        }
+    };
+};
 
 const getOneCourseByCourseKey = async (courseKey) => {
     const query = `
@@ -172,5 +233,5 @@ const getOneCourseByCourseKey = async (courseKey) => {
 }
 
 module.exports = {
-    getAllCourses, getCoursesByOptions, getDetailCourse_contain_detailChapter, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch, getOneCourseByCourseKey
+    getAllCourses, getCoursesByOptions, getDetailCourse_contain_detailChapter, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch, getOneCourseByCourseKey, getAllCourseBySearchMobile
 }

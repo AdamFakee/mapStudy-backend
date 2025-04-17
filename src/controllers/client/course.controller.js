@@ -2,7 +2,7 @@
 
 const { NotFoundError } = require("../../core/error.response");
 const { NoContent, OK } = require("../../core/success.response");
-const { getDetailCourse_contain_detailChapter, getCoursesByOptions, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch } = require("../../services/course.service");
+const { getDetailCourse_contain_detailChapter, getCoursesByOptions, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch, getAllCourseBySearchMobile } = require("../../services/course.service");
 
 const _getDetailCourse_contain_detailChapter = async ( req, res, next ) => {
     const courseId = req.params.courseId;
@@ -61,6 +61,15 @@ const _getAllCourseBySearch = async ( req, res, next ) => {
     const metadata = { courses, pagination };
     return new OK({ metadata }).send(res);
 }
+
+const _getAllCourseBySearchMobile = async ( req, res, next ) => {
+    const { courses, pagination } = await getAllCourseBySearchMobile(req.query);
+    if( courses.length === 0 ) {
+        return new NoContent({}).send(res);
+    }
+    const metadata = { courses, pagination };
+    return new OK({ metadata }).send(res);
+}
 module.exports = {
-    _getDetailCourse_contain_detailChapter, _getCoursesByOptions, _getAllCoursesByTeacherId, _getAllCourseByCategoryId, _getAllCourseBySearch
+    _getDetailCourse_contain_detailChapter, _getCoursesByOptions, _getAllCoursesByTeacherId, _getAllCourseByCategoryId, _getAllCourseBySearch, _getAllCourseBySearchMobile
 }
