@@ -13,6 +13,29 @@ const getLessonById = async (lessonId) => {
     return lesson;
 }
 
+
+const getAllLessonByChapterId = async (chapterId) => {
+    return await lessonModel.findAll({
+        where: {
+            chapter_id: chapterId
+        },
+        raw: true
+    })
+}
+
+const editLesson = async (payload, lessonId) => {
+    return await lessonModel.update(payload, {
+        where: { 
+            id: lessonId,
+        },
+        raw: true
+    });
+}
+
+const createLesson = async ( payload ) => {
+    return await lessonModel.create(payload);
+}
+
 module.exports = {
-    getLessonById
+    getLessonById, editLesson, getAllLessonByChapterId, createLesson
 }

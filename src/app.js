@@ -22,6 +22,8 @@ Database.getInstance()
 
 // init routes
 app.use('/', require('./routers/client/index.router.js'));
+app.use('/admin', require('./routers/admin/index.router.js'));
+
 
 // handle errors
 app.use((req, res, next) => {

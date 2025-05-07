@@ -232,6 +232,38 @@ const getOneCourseByCourseKey = async (courseKey) => {
     return await rawQueryFrameHelper(query);
 }
 
+const editCourse = async (payload, teacherId, courseId) => {
+    return await courseModel.update(payload, {
+        where: { teacher_id: teacherId, id: courseId },
+        raw: true
+    });
+}
+
+const createCourse = async ( payload ) => {
+    return await courseModel.create(payload);
+}
+
+const getOneCourseById = async (id) => {
+    return await courseModel.findOne({
+        where: {
+            id: id,
+            status: 'active'
+        },
+        raw: true
+    })
+}
+
+const deleteCourseById = async (courseId, teacherId) => {
+    return await courseModel.update({
+        status: 'inactive'
+    },{
+        where: {
+          id: courseId,
+          teacher_id: teacherId, 
+        },
+        raw: true
+    });
+}
 module.exports = {
-    getAllCourses, getCoursesByOptions, getDetailCourse_contain_detailChapter, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch, getOneCourseByCourseKey, getAllCourseBySearchMobile
+    getAllCourses, getCoursesByOptions, getDetailCourse_contain_detailChapter, getAllCoursesByTeacherId, getAllCourseByCategoryId, getAllCourseBySearch, getOneCourseByCourseKey, getAllCourseBySearchMobile, editCourse, getOneCourseById, createCourse, deleteCourseById
 }

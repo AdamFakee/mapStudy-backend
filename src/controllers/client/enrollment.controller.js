@@ -1,9 +1,10 @@
 'use strict'
 
-const { BadRequestError } = require("../../core/error.response");
-const { OK } = require("../../core/success.response");
+const { BadRequestError, NotFoundError } = require("../../core/error.response");
+const { OK, SuccessResponse } = require("../../core/success.response");
 const { getOneCourseByCourseKey } = require("../../services/course.service");
-const { createEnrollment, getEnrollmentByUserEmail } = require("../../services/enrollment.service");
+const { createEnrollment, getEnrollmentByUserEmail, getAllCourseBoughtByUserEmail } = require("../../services/enrollment.service");
+const statusCodes = require("../../utils/statusCodes");
 
 const _createEnrollment = async ( req, res, next ) => {
     const { key } = req.body;
@@ -48,6 +49,18 @@ const _isAccess = (req, res) => {
     return new OK({}).send(res)
 }
 
+const _getAllCourseBoughtByUserEmail = async (req, res, next) => {
+    const {email} = req.user;
+    const courses = await getAllCourseBoughtByUserEmail(email);
+    if(courses.length === 0) {
+        return new SuccessResponse({status : statusCodes.NO_CONTENT}).send(res);
+    }
+    const metadata = {
+        courses
+    };
+    return new OK({metadata}).send(res);
+}
+
 module.exports = {
-    _createEnrollment, _isAccess
+    _createEnrollment, _isAccess, _getAllCourseBoughtByUserEmail
 }

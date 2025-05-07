@@ -28,10 +28,10 @@ const courseSchema = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    video_link: {
-      type: DataTypes.STRING(500),
-      allowNull: false,
-    },
+    // video_link: {
+    //   type: DataTypes.STRING(500),
+    //   allowNull: false,
+    // },
     thumbnail: {
       type: DataTypes.STRING(500),
     },

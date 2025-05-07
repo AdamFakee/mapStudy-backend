@@ -3,7 +3,7 @@
 const express = require('express');
 const asyncHandler = require('../../helpers/asyncHandler.helper');
 const { authentication } = require('../../middlewares/client/authentication.middleware');
-const { _createEnrollment, _isAccess } = require('../../controllers/client/enrollment.controller');
+const { _createEnrollment, _isAccess, _getAllCourseBoughtByUserEmail } = require('../../controllers/client/enrollment.controller');
 const accessCoursePermission = require('../../middlewares/client/accessCoursePermission.middleware');
 const router = express.Router();
 
@@ -12,6 +12,7 @@ const router = express.Router();
 router.use(authentication)
 
 router.post('/create', asyncHandler(_createEnrollment))
+router.get('/courseBought', asyncHandler(_getAllCourseBoughtByUserEmail));
 
 //----------------- check permison -------------------//
 router.use(accessCoursePermission);

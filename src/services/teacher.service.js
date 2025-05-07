@@ -21,6 +21,16 @@ const getTeacherById = async ( id ) => {
         raw: true
     });
 }
+
+const getTeacherByEmail = async ( email ) => {
+    return await teacherModel.findOne({
+        where: {
+            email,
+            status: 'active'
+        },
+        raw: true
+    })
+}
 module.exports = {
-    getAllTeachers, getTeacherById, 
+    getAllTeachers, getTeacherById, getTeacherByEmail
 }
