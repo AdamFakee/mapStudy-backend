@@ -20,7 +20,15 @@ const getUserByEmail = async ( email ) => {
     });
 }
 
+const updateUserByEmail = async ( email, payload ) => {
+    return await userModel.update(payload, {
+        where: { 
+            email: email, status: 'active'
+        },
+        raw: true
+    });
+}
 
 module.exports = {
-    createNewUser, getUserByEmail
+    createNewUser, getUserByEmail, updateUserByEmail
 }

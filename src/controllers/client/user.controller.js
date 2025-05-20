@@ -7,7 +7,7 @@ const { hashEmailToInt } = require("../../helpers/hash.helper");
 const { generateKeyPairForToken, createTokenPair } = require('../../helpers/jwt.helper');
 const { createNewKeyToken, createOrUpdateKeyToken, removerKeyTokenByEmail } = require("../../services/keyToken.service");
 const { redisService } = require("../../services/redis.service");
-const { createNewUser, getUserByEmail } = require("../../services/user.service");
+const { createNewUser, getUserByEmail, updateUserByEmail } = require("../../services/user.service");
 const { getInfoData } = require("../../utils/object.util");
 
 // signup 
@@ -92,6 +92,30 @@ const logout = async ( req, res ) => {
     const message = 'logout success'
     return new OK({ message }).send(res );
 }
+
+const _getUserByEmail = async ( req, res ) => {
+    const { email } = req.user;
+    const user = await getUserByEmail(email);
+    delete user.password;
+    const message = 'success';
+
+    const metadata = {user};
+    return new OK({ message, metadata }).send(res);
+}
+
+// edit profile 
+const editProfile = async ( req, res ) => {
+    const { email } = req.user;
+    const payload = req.body;
+    delete payload.password;
+    payload.thumbnail = req.imgUrl || null;
+    console.log(payload)
+
+    await updateUserByEmail(email, payload)
+    const message = 'edit profile'
+    return new OK({ message }).send(res );
+}
+
 module.exports.userController = {
-    login, signup, logout
+    login, signup, logout, editProfile, _getUserByEmail
 }
